@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="WASimCommander.WASimClient">
+      <HintPath>WASimCommander.WASimClient.dll</HintPath>
+    </Reference>
+	  <ContentWithTargetPath Include=".\lib\WASimCommander\Ijwhost.dll">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		  <TargetPath>Ijwhost.dll</TargetPath>
+	  </ContentWithTargetPath>
+	  <ContentWithTargetPath Include=".\lib\WASimCommander\client_conf.ini">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		  <TargetPath>client_conf.ini</TargetPath>
+	  </ContentWithTargetPath>
+  </ItemGroup>
+	
+	
+
+</Project>
