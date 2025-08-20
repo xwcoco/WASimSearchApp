@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 using WASimCommander.CLI.Client;
 using WASimCommander.CLI.Enums;
@@ -9,20 +10,26 @@ namespace WASimSearchApp
     public partial class MainForm : Form
     {
         private WASimClient client;
+        private readonly AutoResetEvent dataUpdateEvent = new AutoResetEvent(false);
+
+        private Boolean initOk = false;
+
+        private Dictionary<int,string> searchResults = new Dictionary<int, string>();
+        
         public MainForm()
         {
             InitializeComponent();
             this.ConnButton.Click += new EventHandler(this.onConnectButtonClick);
             this.initSearchBtn.Click += new EventHandler(this.onInitSearchBtnClick);
+            this.client = new WASimClient(0xA7E57E91);
             this.init();
         }
 
         private void init()   
         {
-            this.client = new WASimClient(0xA7E57E91);
             this.client.OnClientEvent += ClientStatusHandler;
             this.client.OnLogRecordReceived += LogHandler;
-            this.client.OnListResults += Client_OnListResults;
+            this.client.OnListResults += ListResultsHandler;
 
             client.setLogLevel(LogLevel.Info, LogFacility.Remote, LogSource.Client);
             // Set client's console log level to None to avoid double logging to our console. (Client also logs to a file by default.)
@@ -61,21 +68,20 @@ namespace WASimSearchApp
 
         void LogHandler(LogRecord lr, LogSource src)
         {
-            // 使用 BeginInvoke 确保在 UI 线程上执行控件操作
+            SafeLog(lr.ToString(), src.ToString());
+        }
+
+        void SafeLog(string log, string prfx = ":")
+        {
             if (this.logList.InvokeRequired)
             {
-                this.logList.BeginInvoke(new Action(() => AddLogMessage(lr, src)));
+                this.logList.BeginInvoke(new Action(() => SafeLog(log, prfx)));
                 return;
             }
-            
-            AddLogMessage(lr, src);
+            Log(log, prfx);
         }
 
-        private void AddLogMessage(LogRecord lr, LogSource src)
-        {
-            this.logList.Items.Add($"{src} Log: {lr}");
-        }
-
+ 
         private void Log(string log, string prfx = ":")
         {
             string msg = string.Format("[{0}] {1} {2}", DateTime.Now.ToString("mm:ss.fff"), prfx, log);
@@ -83,7 +89,7 @@ namespace WASimSearchApp
             
         }
 
-        void onConnectButtonClick(Object sender,EventArgs e)
+        void onConnectButtonClick(object? sender, EventArgs e)
         {
             this.Log("connect msfs2024....");
             HR hr;  // store method invocation results for logging
@@ -115,7 +121,7 @@ namespace WASimSearchApp
 
         }
 
-        void onInitSearchBtnClick(Object sender,EventArgs e)
+        void onInitSearchBtnClick(object? sender, EventArgs e)
         {
             try
             {
@@ -128,14 +134,28 @@ namespace WASimSearchApp
                 Log("begin Search: " + this.ValueEdit.Text);
 
                 // 使用更安全的方式调用 list 方法
-                HR hr = this.client.list(LookupItemType.LocalVariable);
-                if (hr != HR.OK)
+                HR hr;
+                this.initOk = false;
+                if ((hr = this.client.list(LookupItemType.LocalVariable)) != HR.OK)
                 {
                     Log("Server list failed, Error: " + hr.ToString(), "XX");
                     return;
                 }
                 
                 Log("List command sent successfully", ">>");
+
+                if (!AwaitData(10000))
+                {
+                    // Log("Data update timed out!", "!!");
+                    return;
+                }
+                 Dictionary<int, string>.Enumerator enumerator = this.searchResults.GetEnumerator();
+                 while (enumerator.MoveNext())
+                 {
+                    string value = enumerator.Current.Value;
+                    int arg = enumerator.Current.Key;
+                    this.Log($"{arg} = {value}");
+                 }
             }
             catch (Exception ex)
             {
@@ -143,15 +163,26 @@ namespace WASimSearchApp
             }
         }
 
-        private void Client_OnListResults(ListResult ret)
+        private void ListResultsHandler(ListResult lr)
         {
-            if (this.logList.InvokeRequired)
-            {
-                this.logList.BeginInvoke(new Action(() => Log(ret.ToString())));
-                return;
-            }
+            // if (this.logList.InvokeRequired)
+            // {
+            //     this.logList.BeginInvoke(new Action(() => Log(lr.ToString())));
+            //     return;
+            // }
 
-            Log(ret.ToString());
+            dataUpdateEvent.Set();
+            this.searchResults = lr.list;
+            this.initOk = true;
+            // Log(lr.ToString());
         }
+
+        bool AwaitData(int ms = 1000)
+		{
+			if (dataUpdateEvent.WaitOne(ms))
+				return true;
+			Log("Data update timed out!", "!!");
+			return false;
+		}
     }
 }
