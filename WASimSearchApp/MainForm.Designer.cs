@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             panel1 = new Panel();
-            button2 = new Button();
+            initSearchBtn = new Button();
             ConnButton = new Button();
             splitContainer1 = new SplitContainer();
             panel3 = new Panel();
@@ -52,30 +52,32 @@
             // panel1
             // 
             panel1.AutoSize = true;
-            panel1.Controls.Add(button2);
+            panel1.Controls.Add(initSearchBtn);
             panel1.Controls.Add(ConnButton);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
+            panel1.Margin = new Padding(5, 4, 5, 4);
             panel1.Name = "panel1";
-            panel1.Size = new Size(954, 32);
+            panel1.Size = new Size(1499, 44);
             panel1.TabIndex = 0;
             // 
-            // button2
+            // initSearchBtn
             // 
-            button2.Dock = DockStyle.Right;
-            button2.Location = new Point(831, 0);
-            button2.Margin = new Padding(3, 3, 20, 3);
-            button2.Name = "button2";
-            button2.Size = new Size(123, 32);
-            button2.TabIndex = 1;
-            button2.Text = "Init Search";
-            button2.UseVisualStyleBackColor = true;
+            initSearchBtn.Dock = DockStyle.Right;
+            initSearchBtn.Location = new Point(1306, 0);
+            initSearchBtn.Margin = new Padding(5, 4, 31, 4);
+            initSearchBtn.Name = "initSearchBtn";
+            initSearchBtn.Size = new Size(193, 44);
+            initSearchBtn.TabIndex = 1;
+            initSearchBtn.Text = "Init Search";
+            initSearchBtn.UseVisualStyleBackColor = true;
             // 
             // ConnButton
             // 
-            ConnButton.Location = new Point(12, 6);
+            ConnButton.Location = new Point(19, 8);
+            ConnButton.Margin = new Padding(5, 4, 5, 4);
             ConnButton.Name = "ConnButton";
-            ConnButton.Size = new Size(75, 23);
+            ConnButton.Size = new Size(118, 32);
             ConnButton.TabIndex = 0;
             ConnButton.Text = "Connect";
             ConnButton.UseVisualStyleBackColor = true;
@@ -83,7 +85,8 @@
             // splitContainer1
             // 
             splitContainer1.Dock = DockStyle.Fill;
-            splitContainer1.Location = new Point(0, 32);
+            splitContainer1.Location = new Point(0, 44);
+            splitContainer1.Margin = new Padding(5, 4, 5, 4);
             splitContainer1.Name = "splitContainer1";
             splitContainer1.Orientation = Orientation.Horizontal;
             // 
@@ -95,27 +98,30 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(logList);
-            splitContainer1.Size = new Size(954, 532);
-            splitContainer1.SplitterDistance = 354;
+            splitContainer1.Size = new Size(1499, 752);
+            splitContainer1.SplitterDistance = 500;
+            splitContainer1.SplitterWidth = 6;
             splitContainer1.TabIndex = 1;
             // 
             // panel3
             // 
             panel3.Controls.Add(resultList);
             panel3.Dock = DockStyle.Fill;
-            panel3.Location = new Point(200, 0);
+            panel3.Location = new Point(314, 0);
+            panel3.Margin = new Padding(5, 4, 5, 4);
             panel3.Name = "panel3";
-            panel3.Size = new Size(754, 354);
+            panel3.Size = new Size(1185, 500);
             panel3.TabIndex = 1;
             // 
             // resultList
             // 
             resultList.Dock = DockStyle.Fill;
             resultList.FormattingEnabled = true;
-            resultList.ItemHeight = 17;
+            resultList.ItemHeight = 24;
             resultList.Location = new Point(0, 0);
+            resultList.Margin = new Padding(5, 4, 5, 4);
             resultList.Name = "resultList";
-            resultList.Size = new Size(754, 354);
+            resultList.Size = new Size(1185, 500);
             resultList.TabIndex = 0;
             // 
             // panel2
@@ -126,8 +132,9 @@
             panel2.Controls.Add(ValueEdit);
             panel2.Dock = DockStyle.Left;
             panel2.Location = new Point(0, 0);
+            panel2.Margin = new Padding(5, 4, 5, 4);
             panel2.Name = "panel2";
-            panel2.Size = new Size(200, 354);
+            panel2.Size = new Size(314, 500);
             panel2.TabIndex = 0;
             // 
             // checkBox1
@@ -135,18 +142,20 @@
             checkBox1.AutoSize = true;
             checkBox1.Checked = true;
             checkBox1.CheckState = CheckState.Checked;
-            checkBox1.Location = new Point(14, 96);
+            checkBox1.Location = new Point(22, 136);
+            checkBox1.Margin = new Padding(5, 4, 5, 4);
             checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(72, 21);
+            checkBox1.Size = new Size(102, 28);
             checkBox1.TabIndex = 3;
             checkBox1.Text = "L: Value";
             checkBox1.UseVisualStyleBackColor = true;
             // 
             // button3
             // 
-            button3.Location = new Point(41, 150);
+            button3.Location = new Point(64, 212);
+            button3.Margin = new Padding(5, 4, 5, 4);
             button3.Name = "button3";
-            button3.Size = new Size(75, 23);
+            button3.Size = new Size(118, 32);
             button3.TabIndex = 2;
             button3.Text = "Search";
             button3.UseVisualStyleBackColor = true;
@@ -154,36 +163,40 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(12, 23);
+            label1.Location = new Point(19, 32);
+            label1.Margin = new Padding(5, 0, 5, 0);
             label1.Name = "label1";
-            label1.Size = new Size(78, 17);
+            label1.Size = new Size(113, 24);
             label1.TabIndex = 1;
             label1.Text = "Seach Value";
             // 
             // ValueEdit
             // 
-            ValueEdit.Location = new Point(12, 54);
+            ValueEdit.Location = new Point(19, 76);
+            ValueEdit.Margin = new Padding(5, 4, 5, 4);
             ValueEdit.Name = "ValueEdit";
-            ValueEdit.Size = new Size(171, 23);
+            ValueEdit.Size = new Size(266, 30);
             ValueEdit.TabIndex = 0;
             // 
             // logList
             // 
             logList.Dock = DockStyle.Fill;
             logList.FormattingEnabled = true;
-            logList.ItemHeight = 17;
+            logList.ItemHeight = 24;
             logList.Location = new Point(0, 0);
+            logList.Margin = new Padding(5, 4, 5, 4);
             logList.Name = "logList";
-            logList.Size = new Size(954, 174);
+            logList.Size = new Size(1499, 246);
             logList.TabIndex = 0;
             // 
             // MainForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 17F);
+            AutoScaleDimensions = new SizeF(11F, 24F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(954, 564);
+            ClientSize = new Size(1499, 796);
             Controls.Add(splitContainer1);
             Controls.Add(panel1);
+            Margin = new Padding(5, 4, 5, 4);
             Name = "MainForm";
             Text = "MainForm";
             panel1.ResumeLayout(false);
@@ -201,7 +214,7 @@
         #endregion
 
         private Panel panel1;
-        private Button button2;
+        private Button initSearchBtn;
         private Button ConnButton;
         private SplitContainer splitContainer1;
         private Panel panel3;

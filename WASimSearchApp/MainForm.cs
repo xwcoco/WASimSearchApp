@@ -1,3 +1,5 @@
+using System;
+using System.Windows.Forms;
 using WASimCommander.CLI.Client;
 using WASimCommander.CLI.Enums;
 using WASimCommander.CLI.Structs;
@@ -11,6 +13,7 @@ namespace WASimSearchApp
         {
             InitializeComponent();
             this.ConnButton.Click += new EventHandler(this.onConnectButtonClick);
+            this.initSearchBtn.Click += new EventHandler(this.onInitSearchBtnClick);
             this.init();
         }
 
@@ -19,6 +22,7 @@ namespace WASimSearchApp
             this.client = new WASimClient(0xA7E57E91);
             this.client.OnClientEvent += ClientStatusHandler;
             this.client.OnLogRecordReceived += LogHandler;
+            this.client.OnListResults += Client_OnListResults;
 
             client.setLogLevel(LogLevel.Info, LogFacility.Remote, LogSource.Client);
             // Set client's console log level to None to avoid double logging to our console. (Client also logs to a file by default.)
@@ -30,6 +34,18 @@ namespace WASimSearchApp
 
         void ClientStatusHandler(ClientEvent ev)
         {
+            // 使用 BeginInvoke 确保在 UI 线程上执行控件操作
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new Action(() => UpdateClientStatus(ev)));
+                return;
+            }
+            
+            UpdateClientStatus(ev);
+        }
+
+        private void UpdateClientStatus(ClientEvent ev)
+        {
             if (ev.status == ClientStatus.SimConnected)
             {
                 this.ConnButton.Text = "Connected";
@@ -38,17 +54,29 @@ namespace WASimSearchApp
             {
                 this.ConnButton.Text = "connect";
                 this.ConnButton.BackColor = Color.White;
-
             }
-                this.logList.Items.Add($"Client event {ev.eventType} - \"{ev.message}\"; Client status: {ev.status}");
+            
+            this.logList.Items.Add($"Client event {ev.eventType} - \"{ev.message}\"; Client status: {ev.status}");
         }
 
         void LogHandler(LogRecord lr, LogSource src)
         {
+            // 使用 BeginInvoke 确保在 UI 线程上执行控件操作
+            if (this.logList.InvokeRequired)
+            {
+                this.logList.BeginInvoke(new Action(() => AddLogMessage(lr, src)));
+                return;
+            }
+            
+            AddLogMessage(lr, src);
+        }
+
+        private void AddLogMessage(LogRecord lr, LogSource src)
+        {
             this.logList.Items.Add($"{src} Log: {lr}");
         }
 
-        private void Log(string log, string prfx = "=:")
+        private void Log(string log, string prfx = ":")
         {
             string msg = string.Format("[{0}] {1} {2}", DateTime.Now.ToString("mm:ss.fff"), prfx, log);
             this.logList.SelectedIndex = this.logList.Items.Add(msg);
@@ -85,6 +113,45 @@ namespace WASimSearchApp
                 return;
             }
 
+        }
+
+        void onInitSearchBtnClick(Object sender,EventArgs e)
+        {
+            try
+            {
+                if (this.ValueEdit.Text == "")
+                {
+                    this.Log("Please input search value");
+                    return;
+                }
+                
+                Log("begin Search: " + this.ValueEdit.Text);
+
+                // 使用更安全的方式调用 list 方法
+                HR hr = this.client.list(LookupItemType.LocalVariable);
+                if (hr != HR.OK)
+                {
+                    Log("Server list failed, Error: " + hr.ToString(), "XX");
+                    return;
+                }
+                
+                Log("List command sent successfully", ">>");
+            }
+            catch (Exception ex)
+            {
+                Log($"Error in search: {ex.Message}", "ERROR");
+            }
+        }
+
+        private void Client_OnListResults(ListResult ret)
+        {
+            if (this.logList.InvokeRequired)
+            {
+                this.logList.BeginInvoke(new Action(() => Log(ret.ToString())));
+                return;
+            }
+
+            Log(ret.ToString());
         }
     }
 }
