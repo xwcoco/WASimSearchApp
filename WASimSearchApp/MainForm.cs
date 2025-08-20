@@ -14,18 +14,31 @@ namespace WASimSearchApp
 
         private Boolean initOk = false;
 
-        private Dictionary<int,string> searchResults = new Dictionary<int, string>();
-        
+        private Dictionary<int, string> searchResults = new Dictionary<int, string>();
+
         public MainForm()
         {
             InitializeComponent();
             this.ConnButton.Click += new EventHandler(this.onConnectButtonClick);
             this.initSearchBtn.Click += new EventHandler(this.onInitSearchBtnClick);
+            this.SearchBtn.Click += new EventHandler(this.searchBtnClick);
+            this.FormClosed += this.onClosedEvent;
             this.client = new WASimClient(0xA7E57E91);
             this.init();
         }
 
-        private void init()   
+        private void onClosedEvent(object? sender, EventArgs e)
+        {
+            client.disconnectServer();
+            client.disconnectSimulator();
+            // delete the client
+            client.Dispose();
+
+        }
+
+
+
+        private void init()
         {
             this.client.OnClientEvent += ClientStatusHandler;
             this.client.OnLogRecordReceived += LogHandler;
@@ -47,7 +60,7 @@ namespace WASimSearchApp
                 this.BeginInvoke(new Action(() => UpdateClientStatus(ev)));
                 return;
             }
-            
+
             UpdateClientStatus(ev);
         }
 
@@ -57,12 +70,13 @@ namespace WASimSearchApp
             {
                 this.ConnButton.Text = "Connected";
                 this.ConnButton.BackColor = Color.Green;
-            } else if (ev.status == ClientStatus.ShuttingDown)
+            }
+            else if (ev.status == ClientStatus.ShuttingDown)
             {
                 this.ConnButton.Text = "connect";
                 this.ConnButton.BackColor = Color.White;
             }
-            
+
             this.logList.Items.Add($"Client event {ev.eventType} - \"{ev.message}\"; Client status: {ev.status}");
         }
 
@@ -81,12 +95,34 @@ namespace WASimSearchApp
             Log(log, prfx);
         }
 
- 
+        void showResult()
+        {
+            this.varLists.Items.Clear();
+            Dictionary<int, string>.Enumerator enumerator = this.searchResults.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                string value = enumerator.Current.Value;
+                this.varLists.Items.Add(value);
+            }
+
+        }
+
+        void safeShowResult()
+        {
+            if (this.varLists.InvokeRequired)
+            {
+                this.varLists.BeginInvoke(new Action(() => safeShowResult()));
+                return;
+            }
+            showResult();
+        }
+
+
         private void Log(string log, string prfx = ":")
         {
-            string msg = string.Format("[{0}] {1} {2}", DateTime.Now.ToString("mm:ss.fff"), prfx, log);
+            string msg = string.Format("[{0}] {1} {2}", DateTime.Now.ToString("hh:mm:ss.fff"), prfx, log);
             this.logList.SelectedIndex = this.logList.Items.Add(msg);
-            
+
         }
 
         void onConnectButtonClick(object? sender, EventArgs e)
@@ -130,18 +166,19 @@ namespace WASimSearchApp
                     this.Log("Please input search value");
                     return;
                 }
-                
+
                 Log("begin Search: " + this.ValueEdit.Text);
 
                 // 使用更安全的方式调用 list 方法
                 HR hr;
                 this.initOk = false;
+                this.searchResults.Clear();
                 if ((hr = this.client.list(LookupItemType.LocalVariable)) != HR.OK)
                 {
                     Log("Server list failed, Error: " + hr.ToString(), "XX");
                     return;
                 }
-                
+
                 Log("List command sent successfully", ">>");
 
                 if (!AwaitData(10000))
@@ -149,13 +186,36 @@ namespace WASimSearchApp
                     // Log("Data update timed out!", "!!");
                     return;
                 }
-                 Dictionary<int, string>.Enumerator enumerator = this.searchResults.GetEnumerator();
-                 while (enumerator.MoveNext())
-                 {
-                    string value = enumerator.Current.Value;
-                    int arg = enumerator.Current.Key;
-                    this.Log($"{arg} = {value}");
-                 }
+                float originalFloat;
+                if (float.TryParse(this.ValueEdit.Text, out originalFloat))
+                {
+                    originalFloat = (float)Math.Round(originalFloat, 2);
+                    Dictionary<int, string>.Enumerator enumerator = this.searchResults.GetEnumerator();
+                    Dictionary<int, string> varList = new Dictionary<int, string>();
+                    while (enumerator.MoveNext())
+                    {
+                        string value = enumerator.Current.Value;
+                        int arg = enumerator.Current.Key;
+                        this.SafeLog($"check {value} value");
+                        double fResult = 0;
+                        if (client.getLocalVariable(value, out fResult) == HR.OK)
+                        {
+                            float tempValue = (float)Math.Round((float)fResult, 2);
+                            if (tempValue == originalFloat)
+                            {
+                                varList.Add(arg, value);
+                            }
+                        }
+                        else
+                        {
+                            this.SafeLog($"get {value} value error");
+                        }
+                    }
+                    this.searchResults = varList;
+                    this.SafeLog($"init find {this.searchResults.Count} vars");
+                    safeShowResult();
+
+                }
             }
             catch (Exception ex)
             {
@@ -178,11 +238,65 @@ namespace WASimSearchApp
         }
 
         bool AwaitData(int ms = 1000)
-		{
-			if (dataUpdateEvent.WaitOne(ms))
-				return true;
-			Log("Data update timed out!", "!!");
-			return false;
-		}
+        {
+            if (dataUpdateEvent.WaitOne(ms))
+                return true;
+            Log("Data update timed out!", "!!");
+            return false;
+        }
+
+        private void searchBtnClick(object? sender, EventArgs e)
+        {
+            if (this.ValueEdit.Text == "")
+            {
+                this.Log("Please input search value");
+                return;
+            }
+
+            Log("begin Search: " + this.ValueEdit.Text);
+            float originalFloat;
+            if (float.TryParse(this.ValueEdit.Text, out originalFloat))
+            {
+                originalFloat = (float)Math.Round(originalFloat, 2);
+                Dictionary<int, string>.Enumerator enumerator = this.searchResults.GetEnumerator();
+                Dictionary<int, string> varList = new Dictionary<int, string>();
+                while (enumerator.MoveNext())
+                {
+                    string value = enumerator.Current.Value;
+                    int arg = enumerator.Current.Key;
+                    this.SafeLog($"check {value} value");
+                    double fResult = 0;
+                    if (client.getLocalVariable(value, out fResult) == HR.OK)
+                    {
+                        float tempValue = (float)Math.Round((float)fResult, 2);
+                        if (tempValue == originalFloat)
+                        {
+                            varList.Add(arg, value);
+                        }
+                    }
+                    else
+                    {
+                        this.SafeLog($"get {value} value error");
+                    }
+                }
+                this.searchResults = varList;
+                this.SafeLog($"find {this.searchResults.Count} vars");
+                safeShowResult();
+
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (this.varLists.Items.Count > 0)
+            {
+                if (this.varLists.SelectedIndex != -1)
+                {
+                    Clipboard.SetText(varLists.Items[this.varLists.SelectedIndex].ToString());
+                    this.SafeLog("var name copyed");
+                }
+            }
+            
+        }
     }
 }

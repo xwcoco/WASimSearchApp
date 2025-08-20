@@ -33,13 +33,14 @@
             ConnButton = new Button();
             splitContainer1 = new SplitContainer();
             panel3 = new Panel();
-            resultList = new ListBox();
+            varLists = new ListBox();
             panel2 = new Panel();
             checkBox1 = new CheckBox();
-            button3 = new Button();
+            SearchBtn = new Button();
             label1 = new Label();
             ValueEdit = new TextBox();
             logList = new ListBox();
+            copyBtn = new Button();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -105,7 +106,7 @@
             // 
             // panel3
             // 
-            panel3.Controls.Add(resultList);
+            panel3.Controls.Add(varLists);
             panel3.Dock = DockStyle.Fill;
             panel3.Location = new Point(314, 0);
             panel3.Margin = new Padding(5, 4, 5, 4);
@@ -113,21 +114,23 @@
             panel3.Size = new Size(1185, 500);
             panel3.TabIndex = 1;
             // 
-            // resultList
+            // varLists
             // 
-            resultList.Dock = DockStyle.Fill;
-            resultList.FormattingEnabled = true;
-            resultList.ItemHeight = 24;
-            resultList.Location = new Point(0, 0);
-            resultList.Margin = new Padding(5, 4, 5, 4);
-            resultList.Name = "resultList";
-            resultList.Size = new Size(1185, 500);
-            resultList.TabIndex = 0;
+            varLists.Dock = DockStyle.Fill;
+            varLists.Font = new Font("Microsoft YaHei UI", 18F);
+            varLists.FormattingEnabled = true;
+            varLists.ItemHeight = 46;
+            varLists.Location = new Point(0, 0);
+            varLists.Margin = new Padding(5, 4, 5, 4);
+            varLists.Name = "varLists";
+            varLists.Size = new Size(1185, 500);
+            varLists.TabIndex = 0;
             // 
             // panel2
             // 
+            panel2.Controls.Add(copyBtn);
             panel2.Controls.Add(checkBox1);
-            panel2.Controls.Add(button3);
+            panel2.Controls.Add(SearchBtn);
             panel2.Controls.Add(label1);
             panel2.Controls.Add(ValueEdit);
             panel2.Dock = DockStyle.Left;
@@ -150,15 +153,15 @@
             checkBox1.Text = "L: Value";
             checkBox1.UseVisualStyleBackColor = true;
             // 
-            // button3
+            // SearchBtn
             // 
-            button3.Location = new Point(64, 212);
-            button3.Margin = new Padding(5, 4, 5, 4);
-            button3.Name = "button3";
-            button3.Size = new Size(118, 32);
-            button3.TabIndex = 2;
-            button3.Text = "Search";
-            button3.UseVisualStyleBackColor = true;
+            SearchBtn.Location = new Point(64, 212);
+            SearchBtn.Margin = new Padding(5, 4, 5, 4);
+            SearchBtn.Name = "SearchBtn";
+            SearchBtn.Size = new Size(118, 32);
+            SearchBtn.TabIndex = 2;
+            SearchBtn.Text = "Search";
+            SearchBtn.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -180,14 +183,27 @@
             // 
             // logList
             // 
+            logList.BackColor = SystemColors.Desktop;
             logList.Dock = DockStyle.Fill;
+            logList.Font = new Font("Microsoft YaHei UI", 18F);
+            logList.ForeColor = SystemColors.Menu;
             logList.FormattingEnabled = true;
-            logList.ItemHeight = 24;
+            logList.ItemHeight = 46;
             logList.Location = new Point(0, 0);
             logList.Margin = new Padding(5, 4, 5, 4);
             logList.Name = "logList";
             logList.Size = new Size(1499, 246);
             logList.TabIndex = 0;
+            // 
+            // copyBtn
+            // 
+            copyBtn.Location = new Point(22, 414);
+            copyBtn.Name = "copyBtn";
+            copyBtn.Size = new Size(235, 34);
+            copyBtn.TabIndex = 4;
+            copyBtn.Text = "Copy To Clipboard";
+            copyBtn.UseVisualStyleBackColor = true;
+            copyBtn.Click += button1_Click;
             // 
             // MainForm
             // 
@@ -221,9 +237,10 @@
         private Panel panel2;
         private ListBox logList;
         private CheckBox checkBox1;
-        private Button button3;
+        private Button SearchBtn;
         private Label label1;
         private TextBox ValueEdit;
-        private ListBox resultList;
+        private ListBox varLists;
+        private Button copyBtn;
     }
 }
