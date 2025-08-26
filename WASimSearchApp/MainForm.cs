@@ -211,6 +211,8 @@ namespace WASimSearchApp
                 {
                     this.simvarList = this.simvarManager.GetNumericSimvars();
                 }
+                this.progressBar1.Maximum = this.searchResults.Count + this.simvarList.Count;
+                this.progressBar1.Value = 0;
                 float originalFloat;
                 if (float.TryParse(this.ValueEdit.Text, out originalFloat))
                 {
@@ -235,6 +237,7 @@ namespace WASimSearchApp
                         {
                             this.SafeLog($"get {value} value error");
                         }
+                        this.progressBar1.Value++;
                     }
                     this.searchResults = varList;
 
@@ -248,6 +251,7 @@ namespace WASimSearchApp
                         {
                             tempSimvarList.Add(s);
                         }
+                        this.progressBar1.Value++;
                     });
 
                     this.simvarList = tempSimvarList;
@@ -295,6 +299,8 @@ namespace WASimSearchApp
             }
 
             Log("begin Search: " + this.ValueEdit.Text);
+            this.progressBar1.Maximum = this.searchResults.Count + this.simvarList.Count;
+            this.progressBar1.Value = 0;
             float originalFloat;
             if (float.TryParse(this.ValueEdit.Text, out originalFloat))
             {
@@ -319,6 +325,7 @@ namespace WASimSearchApp
                     {
                         this.SafeLog($"get {value} value error");
                     }
+                    this.progressBar1.Value++;
                 }
                 this.searchResults = varList;
                 this.SafeLog($"find {this.searchResults.Count} vars");
@@ -331,6 +338,7 @@ namespace WASimSearchApp
                     if (tempValue == originalFloat) {
                         tempSimvarList.Add(s);
                     }
+                    this.progressBar1.Value++;
                 });
                 
                 this.simvarList = tempSimvarList;
