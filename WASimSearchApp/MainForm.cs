@@ -16,6 +16,10 @@ namespace WASimSearchApp
 
         private Dictionary<int, string> searchResults = new Dictionary<int, string>();
 
+        private SimvarManager simvarManager = new SimvarManager();
+
+        private List<SimvarInfo> simvarList = new List<SimvarInfo>();
+
         public MainForm()
         {
             InitializeComponent();
@@ -101,9 +105,14 @@ namespace WASimSearchApp
             Dictionary<int, string>.Enumerator enumerator = this.searchResults.GetEnumerator();
             while (enumerator.MoveNext())
             {
-                string value = enumerator.Current.Value;
+                string value = "L:"+enumerator.Current.Value;
                 this.varLists.Items.Add(value);
             }
+
+            this.simvarList.ForEach(s => {
+                string value = "A:"+s.Name;
+                this.varLists.Items.Add(value);
+            });
 
         }
 
@@ -167,24 +176,40 @@ namespace WASimSearchApp
                     return;
                 }
 
-                Log("begin Search: " + this.ValueEdit.Text);
-
-                // 使用更安全的方式调用 list 方法
-                HR hr;
-                this.initOk = false;
-                this.searchResults.Clear();
-                if ((hr = this.client.list(LookupItemType.LocalVariable)) != HR.OK)
+                if (this.lValueCheck.Checked == false && this.aValueCheck.Checked == false)
                 {
-                    Log("Server list failed, Error: " + hr.ToString(), "XX");
+                    this.Log("Please check at least one value type");
                     return;
                 }
 
-                Log("List command sent successfully", ">>");
+                Log("begin Search: " + this.ValueEdit.Text);
 
-                if (!AwaitData(10000))
+                this.initOk = false;
+                this.searchResults.Clear();
+                this.varLists.Items.Clear();
+                this.simvarList.Clear();
+
+                if (this.lValueCheck.Checked)
                 {
-                    // Log("Data update timed out!", "!!");
-                    return;
+                    // 使用更安全的方式调用 list 方法
+                    HR hr;
+                    if ((hr = this.client.list(LookupItemType.LocalVariable)) != HR.OK)
+                    {
+                        Log("Server list failed, Error: " + hr.ToString(), "XX");
+                        return;
+                    }
+
+                    Log("List command sent successfully", ">>");
+
+                    if (!AwaitData(10000))
+                    {
+                        // Log("Data update timed out!", "!!");
+                        return;
+                    }
+                }
+                if (this.aValueCheck.Checked)
+                {
+                    this.simvarList = this.simvarManager.GetNumericSimvars();
                 }
                 float originalFloat;
                 if (float.TryParse(this.ValueEdit.Text, out originalFloat))
@@ -212,7 +237,23 @@ namespace WASimSearchApp
                         }
                     }
                     this.searchResults = varList;
-                    this.SafeLog($"init find {this.searchResults.Count} vars");
+
+                    List<SimvarInfo> tempSimvarList = new List<SimvarInfo>();
+
+                    this.simvarList.ForEach(s =>
+                    {
+                        client.getVariable(new VariableRequest(s.Name, s.Unit, 0), out double fResult, out string sResult);
+                        float tempValue = (float)Math.Round((float)fResult, 2);
+                        if (tempValue == originalFloat)
+                        {
+                            tempSimvarList.Add(s);
+                        }
+                    });
+
+                    this.simvarList = tempSimvarList;
+
+                    this.SafeLog($"init find {this.searchResults.Count} local vars");
+                    this.SafeLog($"init find {this.simvarList.Count} sim vars");
                     safeShowResult();
 
                 }
@@ -281,6 +322,22 @@ namespace WASimSearchApp
                 }
                 this.searchResults = varList;
                 this.SafeLog($"find {this.searchResults.Count} vars");
+
+                List<SimvarInfo> tempSimvarList = new List<SimvarInfo>();
+
+                this.simvarList.ForEach(s => {
+                    client.getVariable(new VariableRequest(s.Name, s.Unit, 0), out double fResult, out string sResult);
+                    float tempValue = (float)Math.Round((float)fResult, 2);
+                    if (tempValue == originalFloat) {
+                        tempSimvarList.Add(s);
+                    }
+                });
+                
+                this.simvarList = tempSimvarList;
+
+                this.SafeLog($"find {this.simvarList.Count} sim vars");
+
+                this.initOk = true;
                 safeShowResult();
 
             }
@@ -308,7 +365,7 @@ namespace WASimSearchApp
                     this.searchBtnClick(sender, e);
                     return;
                 }
-                this.onInitSearchBtnClick(sender,e); 
+                this.onInitSearchBtnClick(sender, e);
             }
         }
     }

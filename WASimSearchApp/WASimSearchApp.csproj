@@ -21,6 +21,10 @@
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		  <TargetPath>client_conf.ini</TargetPath>
 	  </ContentWithTargetPath>
+    <ContentWithTargetPath Include=".\simvar.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>simvar.txt</TargetPath>
+    </ContentWithTargetPath>
   </ItemGroup>
 	
 	
