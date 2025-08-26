@@ -35,12 +35,14 @@
             panel3 = new Panel();
             varLists = new ListBox();
             panel2 = new Panel();
-            checkBox1 = new CheckBox();
+            copyBtn = new Button();
+            lValueCheck = new CheckBox();
             SearchBtn = new Button();
             label1 = new Label();
             ValueEdit = new TextBox();
             logList = new ListBox();
-            copyBtn = new Button();
+            progressBar1 = new ProgressBar();
+            aValueCheck = new CheckBox();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -128,8 +130,10 @@
             // 
             // panel2
             // 
+            panel2.Controls.Add(aValueCheck);
+            panel2.Controls.Add(progressBar1);
             panel2.Controls.Add(copyBtn);
-            panel2.Controls.Add(checkBox1);
+            panel2.Controls.Add(lValueCheck);
             panel2.Controls.Add(SearchBtn);
             panel2.Controls.Add(label1);
             panel2.Controls.Add(ValueEdit);
@@ -140,18 +144,28 @@
             panel2.Size = new Size(314, 500);
             panel2.TabIndex = 0;
             // 
-            // checkBox1
+            // copyBtn
             // 
-            checkBox1.AutoSize = true;
-            checkBox1.Checked = true;
-            checkBox1.CheckState = CheckState.Checked;
-            checkBox1.Location = new Point(22, 136);
-            checkBox1.Margin = new Padding(5, 4, 5, 4);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(102, 28);
-            checkBox1.TabIndex = 3;
-            checkBox1.Text = "L: Value";
-            checkBox1.UseVisualStyleBackColor = true;
+            copyBtn.Location = new Point(33, 375);
+            copyBtn.Name = "copyBtn";
+            copyBtn.Size = new Size(235, 34);
+            copyBtn.TabIndex = 4;
+            copyBtn.Text = "Copy To Clipboard";
+            copyBtn.UseVisualStyleBackColor = true;
+            copyBtn.Click += button1_Click;
+            // 
+            // lValueCheck
+            // 
+            lValueCheck.AutoSize = true;
+            lValueCheck.Checked = true;
+            lValueCheck.CheckState = CheckState.Checked;
+            lValueCheck.Location = new Point(22, 136);
+            lValueCheck.Margin = new Padding(5, 4, 5, 4);
+            lValueCheck.Name = "lValueCheck";
+            lValueCheck.Size = new Size(102, 28);
+            lValueCheck.TabIndex = 3;
+            lValueCheck.Text = "L: Value";
+            lValueCheck.UseVisualStyleBackColor = true;
             // 
             // SearchBtn
             // 
@@ -180,6 +194,7 @@
             ValueEdit.Name = "ValueEdit";
             ValueEdit.Size = new Size(266, 30);
             ValueEdit.TabIndex = 0;
+            ValueEdit.KeyPress += ValueEdit_KeyPress;
             // 
             // logList
             // 
@@ -195,15 +210,23 @@
             logList.Size = new Size(1499, 246);
             logList.TabIndex = 0;
             // 
-            // copyBtn
+            // progressBar1
             // 
-            copyBtn.Location = new Point(22, 414);
-            copyBtn.Name = "copyBtn";
-            copyBtn.Size = new Size(235, 34);
-            copyBtn.TabIndex = 4;
-            copyBtn.Text = "Copy To Clipboard";
-            copyBtn.UseVisualStyleBackColor = true;
-            copyBtn.Click += button1_Click;
+            progressBar1.Dock = DockStyle.Bottom;
+            progressBar1.Location = new Point(0, 466);
+            progressBar1.Name = "progressBar1";
+            progressBar1.Size = new Size(314, 34);
+            progressBar1.TabIndex = 5;
+            // 
+            // aValueCheck
+            // 
+            aValueCheck.AutoSize = true;
+            aValueCheck.Location = new Point(141, 136);
+            aValueCheck.Name = "aValueCheck";
+            aValueCheck.Size = new Size(106, 28);
+            aValueCheck.TabIndex = 6;
+            aValueCheck.Text = "A: Value";
+            aValueCheck.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -236,11 +259,13 @@
         private Panel panel3;
         private Panel panel2;
         private ListBox logList;
-        private CheckBox checkBox1;
+        private CheckBox lValueCheck;
         private Button SearchBtn;
         private Label label1;
         private TextBox ValueEdit;
         private ListBox varLists;
         private Button copyBtn;
+        private ProgressBar progressBar1;
+        private CheckBox aValueCheck;
     }
 }

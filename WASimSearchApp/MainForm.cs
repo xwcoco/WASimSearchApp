@@ -296,7 +296,20 @@ namespace WASimSearchApp
                     this.SafeLog("var name copyed");
                 }
             }
-            
+
+        }
+
+        private void ValueEdit_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                if (this.initOk)
+                {
+                    this.searchBtnClick(sender, e);
+                    return;
+                }
+                this.onInitSearchBtnClick(sender,e); 
+            }
         }
     }
 }
