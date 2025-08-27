@@ -313,7 +313,7 @@ namespace WASimSearchApp
             {
                 if (!File.Exists(filePath))
                 {
-                    throw new FileNotFoundException($"Sim变量文件未找到: {filePath}");
+                    throw new FileNotFoundException($"Sim vars file not found: {filePath}");
                 }
 
                 var simvars = new List<SimvarInfo>();
@@ -343,11 +343,9 @@ namespace WASimSearchApp
                 }
 
                 AddSimvars(simvars);
-                Console.WriteLine($"成功从文件 {filePath} 加载了 {simvars.Count} 个Sim变量");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"从文件加载Sim变量时出错: {ex.Message}");
                 throw;
             }
         }
